@@ -9,58 +9,8 @@
 #include <getopt.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
-#include "List.h"
-  // Comando ls
-void cmd_ls(char *cadena, char *trozos) {
-  struct dirent * d;
-  DIR *direct=NULL; 
-
-  if (trozos=0)
-     if ((trozos=opendir(trozos))==NULL)
-    printf("Error. No se encontro el directorio");
-       else closedir(direct);
-    
-  chdir(trozos);
-  direct = opendir(".");
-  d=readdir(direct);
-}
-/////////////////////////////////////////////////////
-
-  // Comando list
-
-int ListarDirectorio (char *dir, int hayS, int hayA){
-  
-  DIR *p;
-  struct dirent *d;
-
-  if ((p=opendir(dir))==NULL)
-  return -1;
-  while ((d=readdir(p))!=NULL){
-    if (!hayA && d->d_name[0]=='.')
-    continue;
-    if (hayS)
-      printf ("%s\n", d ->d_name);
-    else
-      printf("%s\n,DetallesFichero(dir,d->d_name");
-  }
-  return(closedir(p));
-}
-
-void cmd_list(char *tr[]){
-  int hayS=0,hayA=0, i;
-  char *dir=".";
-  char diract[MAX_ENTRADA];
-  getcwd(diract, MAX_ENTRADA);
-
-  for (i=0; tr[i]!=NULL; i++){
-    if (!strcmp(tr[i],"-s")) hayS=1;
-    else if (!strcmp(tr[i],"-a")) hayA=1;
-    else dir=tr[i];
-  }
-if (ListarDirectorio(dir,hayS,hayA)==-1)
-  perror ("Error al listar Directorio");
-
-}
+#include <errno.h>
+#include "lista.h"
 
 char *NombreUsuario(uid_t uid){
 
@@ -77,14 +27,7 @@ char *NombreGrupo(gid_t gid){
     return("¿?");
   return g->gr_name;
 }
-/*
-char * Fecha (time_t t){
-  
-  char *aux=ctime (&t);
-  aux [strlen(aux)-1]='\0';
-  strcpy(aux+19);
-  return aux;
-}*/
+
 char TipoFichero (mode_t m)
 {
 switch (m&S_IFMT) 
@@ -120,17 +63,66 @@ char * Permisos (mode_t m)
   return permisos;
 }
 
-char *DetallesFichero (char *dir, char *f){
+void DetallesFichero (char *dir, char *f){
   
   static char aux[MAX_ENTRADA];
-
   struct stat s;
 
   sprintf(aux,"%s/%s",dir,f);
-  if (lstat(aux,"&s")==-1){
+  if (lstat(aux,&s)==-1){
 
     sprintf(aux,"Error al acceder a %s:%s",f,strerror);
-    return aux;
+    return;
   }
-  sprintf(aux,"%7lu %s %3lu %16s %6s %8lu %s %s",(unsigned long)s.st_ino,Permisos(s.st_mode),(unsigned long)s.st_nlink,NombreUsuario(s.st_uid),NombreGrupo(s.st_uid));
+
+  printf("%10lu",(unsigned long)s.st_ino);
+  printf("   %10s",Permisos(s.st_mode));
+  printf("%10lu",(unsigned long)s.st_nlink);
+  printf("%10s",NombreUsuario(s.st_uid));
+  printf("%10s",NombreGrupo(s.st_uid));
+  printf("    %-20s",f );
+  printf("\n");
 }
+
+
+int ListarDirectorio (char *dir, int hayS, int hayA){
+
+  DIR *p;
+  struct dirent *d;
+
+  if ((p=opendir(dir))==NULL)
+    return -1;
+    while ((d=readdir(p))!=NULL){
+    if (!hayA && d->d_name[0]=='.')
+      continue;
+    if (hayS)
+      printf ("%s\n", d ->d_name);
+   else{
+      // printf("%s %15s",d->d_name,"" ); 
+      DetallesFichero(dir,d->d_name);
+      // DetallesFichero(dir,d->d_name);
+    }
+  }
+  return(closedir(p));
+}
+
+void cmd_list(char *tr[]){
+  int hayS=0,hayA=0, i;
+  char *dir=".";
+  char diract;
+  getcwd(diract, MAX_ENTRADA);
+  for (i=1; tr[i]!=NULL; i++){
+    if (!strcmp(tr[i],"-s"))
+      { 
+        hayS=1;
+      }
+    if (!strcmp(tr[i],"-a")) hayA=1;
+    else dir=tr[i];
+  }
+if (ListarDirectorio(dir,hayS,hayA)==-1)
+  perror ("Error al listar Directorio");
+
+}
+
+
+
