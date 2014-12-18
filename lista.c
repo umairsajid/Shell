@@ -26,24 +26,24 @@ pnodo ultimo(lista l){
 	return aux;
 }
 
-pnodo buscarDato(int n, lista l){
+pnodo buscarproceso(int n, lista l){
 	pnodo aux = l;
-	while ((aux != NULL) && (aux->dato.pid != n)) aux = aux->siguiente;
+	while ((aux != NULL) && (aux->proceso.pid != n)) aux = aux->siguiente;
 	return aux;
 }
 
-data obtenerDato(pnodo p){
-	return (p->dato);
+procesos obtenerproceso(pnodo p){
+	return (p->proceso);
 }
 
 pnodo anterior(int n, lista l) {
 	pnodo pos = l;
-	while ((pos->siguiente != NULL) && (pos->siguiente->dato.pid !=n)) 
+	while ((pos->siguiente != NULL) && (pos->siguiente->proceso.pid !=n)) 
 		pos = pos->siguiente;
 	return pos;
 }
 
-int eliminarDato(int n, lista *l){
+int eliminarproceso(int n, lista *l){
 	pnodo aux, aux2 = anterior(n, *l);
 	if (aux2 == NULL) {
 		return -1;
@@ -60,21 +60,21 @@ void vaciarLista (lista *l){
 	while (aux!=NULL) {
 		aux2 = aux;
 		aux = aux -> siguiente;
-		eliminarDato(aux2->dato.pid,l);
+		eliminarproceso(aux2->proceso.pid,l);
 	}
 }
 	
-int insertarDato(data n, lista *l, pnodo pos){
+int insertarproceso(procesos n, lista *l, pnodo pos){
 	pnodo aux = (pnodo) malloc(sizeof(struct nodo));
 	if (aux == NULL) {
 		return -1;
 	}
-	aux->dato = n;
+	aux->proceso = n;
 	aux->siguiente = pos->siguiente;
 	pos->siguiente=aux;
 	return 0;	
 }
 
-void actualizarDato (data n, pnodo pos, lista *l){
-	pos->dato=n;
+void actualizarproceso (procesos n, pnodo pos, lista *l){
+	pos->proceso=n;
 }

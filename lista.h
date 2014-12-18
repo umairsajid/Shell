@@ -4,22 +4,19 @@
 #ifndef LISTA_PROC
 #define LISTA_PROC
 #define MAX_ENTRADA 4096
-#define MAXPATH 500
-#define RUNNING 0
-#define TERMSIG 1
-#define TERMNORM 2
-#define STOP 3
+
  
-typedef struct data {
+typedef struct procesos {
 	pid_t pid;
 	int estado;
+	int sig;
 	
 	time_t tiempo;
-	char ejec[MAXPATH];
-} data;
+	char ejec[MAX_ENTRADA];
+} procesos;
  
 struct nodo {
-	data dato;
+	procesos proceso;
 	struct nodo * siguiente;
 };
 typedef struct nodo *pnodo;
@@ -29,13 +26,13 @@ int crearLista(lista *);
 int esListaVacia(lista);
 pnodo primero(lista);
 pnodo ultimo(lista);
-pnodo buscarDato(int, lista);
-data obtenerDato(pnodo);
+pnodo buscarproceso(int, lista);
+procesos obtenerproceso(pnodo);
 pnodo anterior(int, lista);
-int eliminarDato(int, lista *);
+int eliminarproceso(int, lista *);
 void vaciarLista (lista *);
-int insertarDato(data, lista*, pnodo);
-void actualizarDato (data, pnodo, lista *);
+int insertarproceso(procesos, lista*, pnodo);
+void actualizarproceso (procesos, pnodo, lista *);
 
 #endif
 

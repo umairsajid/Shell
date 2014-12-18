@@ -66,22 +66,22 @@ char * Permisos (mode_t m)
 void DetallesFichero (char *dir, char *f){
   
   static char aux[MAX_ENTRADA];
-  struct stat s;
-
+  struct stat buffer;
   sprintf(aux,"%s/%s",dir,f);
-  if (lstat(aux,&s)==-1){
-
+  
+  if (lstat(aux,&buffer)==-1){
     sprintf(aux,"Error al acceder a %s:%s",f,strerror);
     return;
-  }
-
-  printf("%10lu",(unsigned long)s.st_ino);
-  printf("   %10s",Permisos(s.st_mode));
-  printf("%10lu",(unsigned long)s.st_nlink);
-  printf("%10s",NombreUsuario(s.st_uid));
-  printf("%10s",NombreGrupo(s.st_uid));
+  }else{
+  printf("%10lu",(unsigned long)buffer.st_ino);
+  printf("   %10s",Permisos(buffer.st_mode));
+  printf("%10lu",(unsigned long)buffer.st_nlink);
+  printf("%10s",NombreUsuario(buffer.st_uid));
+  printf("%10s",NombreGrupo(buffer.st_gid));
   printf("    %-20s",f );
   printf("\n");
+}
+
 }
 
 
@@ -92,11 +92,13 @@ int ListarDirectorio (char *dir, int hayS, int hayA){
 
   if ((p=opendir(dir))==NULL)
     return -1;
-    while ((d=readdir(p))!=NULL){
+
+  while ((d=readdir(p))!=NULL){
     if (!hayA && d->d_name[0]=='.')
       continue;
-    if (hayS)
+    if (hayS){
       printf ("%s\n", d ->d_name);
+  }
    else{
       // printf("%s %15s",d->d_name,"" ); 
       DetallesFichero(dir,d->d_name);
@@ -106,23 +108,20 @@ int ListarDirectorio (char *dir, int hayS, int hayA){
   return(closedir(p));
 }
 
-void cmd_list(char *tr[]){
+
+void cmd_list(char *tr[],int trozos){
   int hayS=0,hayA=0, i;
   char *dir=".";
-  char diract;
-  getcwd(diract, MAX_ENTRADA);
+
   for (i=1; tr[i]!=NULL; i++){
-    if (!strcmp(tr[i],"-s"))
-      { 
-        hayS=1;
-      }
-    if (!strcmp(tr[i],"-a")) hayA=1;
-    else dir=tr[i];
+    if (!strcmp(tr[i],"-s")){ hayS=1;}
+    else{
+    	if (!strcmp(tr[i],"-a")){ hayA=1;}
+    	else dir=tr[i];
+	}
   }
-if (ListarDirectorio(dir,hayS,hayA)==-1)
-  perror ("Error al listar Directorio");
 
+if ((dir,hayS,hayA)==-1)
+	dir=".";
+	ListarDirectorio(dir,hayS,hayA);
 }
-
-
-

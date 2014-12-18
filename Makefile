@@ -8,6 +8,7 @@ all:
 	$(CC) -c Entrada.c -w -lm
 	$(CC) -c List.c -w -lm
 	$(CC) Shell.c Entrada.o CdPid.o Delete.o Fork.o List.o lista.o -o Shell
+	./Shell
 execute:
 	clear
 	./Shell
