@@ -314,5 +314,3 @@ void clearjobs(lista *l, int createlist){
     }
   } 
 }
-void jobs()
-char procesos [MAX_PROCESO]
